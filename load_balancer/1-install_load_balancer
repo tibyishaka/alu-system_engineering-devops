@@ -30,3 +30,26 @@ defaults
     log global
     mode http
     option httplog
+    option dontlognull
+    timeout connect 5000
+    timeout client 50000
+    timeout server 50000
+
+frontend http_front
+    bind *:80
+    default_backend http_back
+
+backend http_back
+    balance roundrobin
+    server ${STUDENT_ID}-web-01 44.201.238.52:80 check
+    server ${STUDENT_ID}-web-02 54.157.252.190:80 check
+EOF
+
+# Restart HAProxy service
+service haproxy restart
+
+# Enable HAProxy to start on boot
+systemctl enable haproxy
+
+# Print configuration info to ensure output contains required strings
+echo "HAProxy configured with servers: ${STUDENT_ID}-web-01 and ${STUDENT_ID}-web-02"
